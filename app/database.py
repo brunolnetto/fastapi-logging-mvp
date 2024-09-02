@@ -5,10 +5,14 @@ from dotenv import load_dotenv
 from contextlib import contextmanager
 from psycopg2 import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy import pool, text, inspect
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
+from typing import Annotated, NamedTuple, Generator
+from fastapi import Depends
 
 from .config import settings
 
@@ -49,6 +53,9 @@ class Database:
             if not database_exists(self.uri):
                 # Create the database engine and session maker
                 create_database(self.uri)
+                print(f'Database {settings.POSTGRES_DBNAME} created!')
+            else:
+                print(f'Database {settings.POSTGRES_DBNAME} already exists!')
 
         except OperationalError as e:
             print(f"Error creating to database: {e}")
@@ -79,19 +86,24 @@ class Database:
             # Create all tables defined using the Base class (if not already created)
             with self.engine.begin() as conn:
                 Base.metadata.create_all(self.engine)
-                
-            print("Tables created!")
+
+            tables = self.get_table_names()
+            
+            print(f"Tables {tables} created!")
 
         except Exception as e:
             print(f"Error creating tables in the database: {str(e)}")
 
+    def get_table_names(self):
+        inspector = inspect(self.engine)
+        return inspector.get_table_names()
+    
     def print_tables(self):
         """
         Print the available tables in the database.
         """
         try:
-            inspector = inspect(self.engine)
-            tables = inspector.get_table_names()
+            tables = self.get_table_names()
             print(f"Available tables: {tables}")
         except Exception as e:
             print(f"Error fetching table names: {str(e)}")
@@ -127,6 +139,18 @@ class Database:
             self.print_tables()
         except Exception as e:
             print(f"Error print available tables: {e}")
+            
+    def disconnect(self):
+        """
+        Clean up and close the database connection and session maker.
+        """
+        try:
+            # Close all connections in the pool
+            self.engine.dispose()
+            print("Database connections closed.")
+        except Exception as e:
+            print(f"Error closing database connections: {str(e)}")
+
 
     def __repr__(self):
         return f"<Database(uri={self.uri})>"
@@ -144,6 +168,11 @@ def init_database() -> Database:
 
     return database
 
+def disconnect_database() -> Database:
+    global database
+    
+    database.disconnect()
+
 async def get_db():
     """
     Define a dependency to create a database connection
@@ -159,18 +188,17 @@ async def get_db():
     yield database
 
 @contextmanager
-def get_session():
+def get_session() -> Generator[Session, None, None]:
     """
     Define a dependency to create a database session asynchronously.
 
     Returns:
         AsyncSession: An async session for interacting with the database.
     """
-    # Ensure database is initialized before getting a session
     if database is None:
         init_database()
-
-    for session in database.get_session():
+    
+    with database.session_maker() as session:
         try:
             yield session
         finally:
