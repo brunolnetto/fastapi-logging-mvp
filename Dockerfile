@@ -12,5 +12,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the content of the local src directory to the working directory
 COPY . .
 
-# Specify the command to run on container start
-CMD [ "python", "./app/main.py" ]
+# Run the application
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
