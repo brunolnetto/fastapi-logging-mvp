@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from typing import Annotated, NamedTuple, Generator
 from fastapi import Depends
 
-from .config import settings
+from app.config import settings
 
 Base = declarative_base()
 
@@ -158,7 +158,6 @@ class Database:
 
 # Load environment variables from the .env file
 database = None
-
 
 def init_database() -> Database:
     global database

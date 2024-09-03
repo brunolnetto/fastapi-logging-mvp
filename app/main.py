@@ -8,13 +8,19 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-from .database import database, init_database, get_session
-from .repositories.logs import RequestLogRepository
-from .schemas import RequestLogCreate
-from .middleware import AsyncRequestLoggingMiddleware
-from .repositories.logs import get_request_logs_repository
-from .utils.migrations import generate_migrations, run_migrations
-from .scheduler.bundler import schedulers
+from app.database.base import database, init_database, get_session
+from app.repositories.logs import RequestLogRepository
+from app.repositories.logs import get_request_logs_repository
+
+from app.schemas import RequestLogCreate
+from app.middlewares.logs import AsyncRequestLoggingMiddleware
+from app.utils.migrations import generate_migrations, run_migrations
+
+from app.scheduler.bundler import task_orchestrator
+from app.rate_limiter import limiter
+from app.routers.bundler import routers
+
+from app.config import settings
 
 # Dependency to get DB session
 async def get_db():
@@ -23,20 +29,27 @@ async def get_db():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_database()
+    database=init_database()
     
-    for scheduler in schedulers:
-        scheduler.start()
+    task_orchestrator.start()
     print("Scheduler started!")
 
     yield
     database.disconnect()
+    
+    task_orchestrator.shutdown()
+    print("Scheduler shutdown!")
 
 # Dependency to get the async session
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    docs_url=f"{settings.API_V1_STR}/docs",
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    redoc_url=f"{settings.API_V1_STR}/redoc",
+)
 
-# Initialize the Limiter with a global rate limit (e.g., 5 requests per minute)
-limiter = Limiter(key_func=get_remote_address, default_limits=["5/minute"])
+for router in routers:
+    app.include_router(router, prefix=settings.API_V1_STR)
 
 # Register the rate limit exceeded handler
 app.state.limiter = limiter
@@ -45,33 +58,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Custom error handling example for rate limiting
 @app.exception_handler(RateLimitExceeded)
 async def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    return JSONResponse(
-        status_code=429,
-        content={"detail": "Too many requests, please slow down!"},
-    )
-
+    detail_dict={"detail": "Too many requests, please slow down!"}
+    return JSONResponse(status_code=429, content=detail_dict)
 
 app.add_middleware(AsyncRequestLoggingMiddleware)
-
-@app.get("/hello")
-@limiter.limit("10/minute")
-def hello(request: Request):
-    return {"hello": "world"}
-
-@app.post("/request_logs")
-@limiter.limit("10/minute")
-def create_log(
-        request: Request,
-        data: Dict[str, Any],
-        request_log_repository: RequestLogRepository = Depends(get_request_logs_repository)
-    ):
-    return data
-
-@app.get("/request_logs")
-@limiter.limit("10/minute")
-async def read_logs(
-        request: Request,
-        request_log_repository: RequestLogRepository = Depends(get_request_logs_repository), 
-        skip: int = 0, limit: int = 100
-    ):
-    return request_log_repository.get_request_logs(skip=skip, limit=limit)

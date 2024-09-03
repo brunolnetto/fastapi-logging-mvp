@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     POSTGRES_PORT: str
     POSTGRES_DBNAME: str
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
+    
+    API_V1_STR: str = "/api"
 
     @field_validator("SQLALCHEMY_DATABASE_URI", mode="before")
     @classmethod

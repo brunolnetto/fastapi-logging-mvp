@@ -3,60 +3,53 @@ from datetime import datetime, timedelta
 from sqlalchemy import delete
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Annotated
+from sqlalchemy.orm import Session
+from typing import Dict, Any, List, Annotated,  Optional
 from contextlib import contextmanager
 from fastapi import Depends
 
-from ..models import RequestLog
-from ..schemas import RequestLogCreate
-from ..database import get_session
 
+from uuid import UUID
 
-class RequestLogRepository:
+from app.database.models.logs import TaskLog, RequestLog
+from app.schemas import TaskLogCreate
 
-    def __init__(self, session):
-        self.session = session
+from app.schemas import RequestLogCreate
+from app.database.base import get_session
+from app.repositories.base import BaseRepository
 
-    def create_request_log(self, log: RequestLogCreate) -> RequestLog:
-        db_log = RequestLog(
-            relo_method=log.method,
-            relo_url=log.url,
-            relo_body=log.body,
-            relo_headers=log.headers,
-            relo_absolute_path=log.absolute_path,
-            relo_status_code=log.status_code,
-            relo_ip_address=log.ip_address,
-            relo_device_info=log.device_info,
-            relo_request_duration=log.request_duration_seconds,
-            relo_response_size=log.response_size
-        )
+class RequestLogRepository(BaseRepository):
+    def create(self, log: RequestLogCreate) -> RequestLog:
+        db_log = RequestLog(**log.model_dump())
         self.session.add(db_log)
         self.session.commit()
         self.session.refresh(db_log)
         return db_log
 
-    def get_request_logs(self, skip: int = 0, limit: int = 100) -> List[RequestLog]:
-        """
-        Get a list of request logs.
+    def update(self, id: UUID, data: Dict[str, Any]) -> Optional[RequestLog]:
+        # Not typically used for RequestLog, but implemented for completeness
+        return None
 
-        Args:
-            skip (int, optional): Value to skip results. Defaults to 0.
-            limit (int, optional): Value to limit the results. Defaults to 100.
+    def get_by_id(self, id: UUID) -> Optional[RequestLog]:
+        return self.session.get(RequestLog, id)
 
-        Returns:
-            List[RequestLog]: _description_
-        """
-        
-        result = self.session.execute(select(RequestLog).offset(skip).limit(limit))
+    def delete_by_id(self, id: UUID) -> bool:
+        log = self.get_by_id(id)
+        if not log:
+            return False
+        self.session.delete(log)
+        self.session.commit()
+        return True
+
+    def get_all(self, limit: int = 100, offset: int = 0) -> List[RequestLog]:
+        result = self.session.execute(select(RequestLog).offset(offset).limit(limit))
         return result.scalars().all()
 
-    async def delete_old_logs(self, time_delta: timedelta):
-        """Delete logs older than a certain number of days."""
+    def delete_old_logs(self, time_delta: timedelta):
         cutoff_date = datetime.now() - time_delta
-        
-        # Build the delete query
         delete_query = delete(RequestLog).where(RequestLog.relo_inserted_at < cutoff_date)
         self.session.execute(delete_query)
+        self.session.commit()
 
 
 async def get_request_logs_repository() -> RequestLogRepository:
@@ -71,3 +64,63 @@ async def get_request_logs_repository() -> RequestLogRepository:
     """
     with get_session() as session:
         return RequestLogRepository(session)
+
+
+class TaskLogRepository(BaseRepository):
+    def create(self, task_log_data: TaskLogCreate) -> TaskLog:
+        task_log = TaskLog(**task_log_data)
+        self.session.add(task_log)
+        self.session.commit()
+        self.session.refresh(task_log)
+        return task_log
+
+    def update(self, id: UUID, data: TaskLogCreate) -> Optional[TaskLog]:
+        task_log = self.get_by_id(id)
+        if not task_log:
+            return None
+
+        for key, value in data.dict(exclude_unset=True).items():
+            setattr(task_log, key, value)
+
+        self.session.commit()
+        self.session.refresh(task_log)
+        return task_log
+
+    def get_by_id(self, id: UUID) -> Optional[TaskLog]:
+        return self.session.get(TaskLog, id)
+
+    def delete_by_id(self, id: UUID) -> bool:
+        task_log = self.get_by_id(id)
+        if not task_log:
+            return False
+
+        self.session.delete(task_log)
+        self.session.commit()
+        return True
+
+    def get_all(self, limit: int = 100, offset: int = 0) -> List[TaskLog]:
+        return self.session.execute(
+            select(TaskLog).offset(offset).limit(limit)
+        ).scalars().all()
+
+    def delete_old_logs(self, time_delta: timedelta):
+        cutoff_date = datetime.now() - time_delta
+        self.session.query(TaskLog).filter(TaskLog.talo_start_time < cutoff_date).delete()
+        self.session.commit()
+
+
+def get_request_logs_repository():
+    with get_session() as session:
+        return RequestLogRepository(session)
+    
+def get_task_logs_repository():
+    with get_session() as session:
+        return TaskLogRepository(session)
+
+RequestLogsRepositoryDependency=Annotated[
+    RequestLogRepository, Depends(get_request_logs_repository)
+]
+
+TaskLogsRepositoryDependency=Annotated[
+    TaskLogRepository, Depends(get_task_logs_repository)
+]
