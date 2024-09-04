@@ -45,10 +45,10 @@ cleanup_request_config=TaskConfig(
     task_name=f"Cleanup request logs with schedule period {settings.REQUEST_CLEANUP_CRON_KWARGS}",
     task_type="cron",
     task_callable=cleanup_request_logs,
-    task_args=(
+    task_args=[
         settings.REQUEST_CLEANUP_AGE, 
-        settings.REQUEST_CLEANUP_MAX_ROWS
-    ),
+        settings.REQUEST_CLEANUP_MAX_ROWS,
+    ],
 )
 
 # Schedule the task to run at regular intervals
@@ -58,8 +58,8 @@ cleanup_task_config=TaskConfig(
     task_name=f"Cleanup task logs with schedule period {settings.TASK_CLEANUP_CRON_KWARGS}",
     task_type="cron",
     task_callable=cleanup_task_logs,
-    task_args=(
-        settings.TASK_CLEANUP_AGE,
-        settings.TASK_CLEANUP_MAX_ROWS
-    ),
+    task_args=[
+        settings.REQUEST_CLEANUP_AGE, 
+        settings.REQUEST_CLEANUP_MAX_ROWS,
+    ],
 )

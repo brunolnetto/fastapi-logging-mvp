@@ -1,6 +1,6 @@
 # app/schemas.py
 from pydantic import BaseModel, Field, UUID4
-from typing import Tuple, Dict, Callable, Optional, Any
+from typing import List, Dict, Callable, Optional, Any
 from datetime import datetime
 
 from uuid import uuid4
@@ -70,7 +70,7 @@ class TaskConfig(BaseModel):
     task_name: str
     task_type: str
     task_callable: Callable
-    task_args: Tuple[Any] = ()
+    task_args: List[Any] = Field(default_factory=list)
     task_details: Dict[str, Any] = Field(default_factory=dict)
     
     def __eq__(self, other):
