@@ -6,6 +6,7 @@ import asyncio
 from app.database.base import get_session
 from app.repositories.logs import RequestLogRepository, TaskLogRepository
 from app.schemas import TaskConfig
+from app.config import settings
 
 async def cleanup_request_logs(time_delta: timedelta):
     """
@@ -29,41 +30,22 @@ async def cleanup_task_logs(time_delta: timedelta):
         task_log_repository = TaskLogRepository(db_session)
         await task_log_repository.delete_old_logs(time_delta)
 
-# Create a job function for scheduling
-# Define cron parameters for scheduling
-CLEANUP_REQUEST_CRON_KWARGS = {
-    'minute': '0',
-    'hour': '0',        # Runs at midnight
-    'day': '*',         # Every day
-    'month': '*',       # Every month
-    'day_of_week': '*'  # Every day of the week
-}
-
 # Schedule the task to run at regular intervals
 cleanup_request_config=TaskConfig(
     schedule_type='asyncio',
-    schedule_params=CLEANUP_REQUEST_CRON_KWARGS,
-    task_name=f"Cleanup request logs with schedule period {CLEANUP_REQUEST_CRON_KWARGS}",
+    schedule_params=settings.REQUEST_CLEANUP_CRON_KWARGS,
+    task_name=f"Cleanup request logs with schedule period {settings.REQUEST_CLEANUP_CRON_KWARGS}",
     task_type="cron",
     task_callable=cleanup_request_logs,
-    task_args=(timedelta(days=7), ),
+    task_args=(settings.REQUEST_CLEANUP_AGE, ),
 )
-
-# Define cron parameters for scheduling
-CLEANUP_TASK_CRON_KWARGS = {
-    'minute': '0',
-    'hour': '0',        # Runs at midnight
-    'day': '1',         # Every first day of the month
-    'month': '*',       # Every month
-    'day_of_week': '*'  # Every day of the week
-}
 
 # Schedule the task to run at regular intervals
 cleanup_task_config=TaskConfig(
     schedule_type='asyncio',
-    schedule_params=CLEANUP_TASK_CRON_KWARGS,
-    task_name=f"Cleanup task logs with schedule period {CLEANUP_TASK_CRON_KWARGS}",
+    schedule_params=settings.TASK_CLEANUP_CRON_KWARGS,
+    task_name=f"Cleanup task logs with schedule period {settings.TASK_CLEANUP_CRON_KWARGS}",
     task_type="cron",
     task_callable=cleanup_request_logs,
-    task_args=(timedelta(days=30),),
+    task_args=(settings.TASK_CLEANUP_AGE,),
 )

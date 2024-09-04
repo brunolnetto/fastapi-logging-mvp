@@ -1,11 +1,12 @@
 # This code snippet is setting up a scheduler in Python using the `asyncio` library for scheduling a
 # task to clean up logs at regular intervals. Here's a breakdown of what the code is doing:
 from datetime import timedelta
-from asyncio import create_task
+import asyncio
 
 from app.scheduler.tasks.logs import cleanup_request_logs
 from app.scheduler.base import TaskOrchestrator, TaskRegister
-from app.repositories.tasks import TaskRepository
+from app.repositories.tasks import TaskRepository, get_task_repository
+from app.schemas import TaskConfig
 
 from app.database.base import get_session
 
@@ -18,14 +19,34 @@ async def add_tasks():
     This function creates a task orchestrator and adds tasks to it.
     
     The tasks are defined in the `task_configs` list, which contains 
-    dictionaries with the following keys
+    instances of TaskConfig.
     """
+    
+    task_repository = get_task_repository()
+    
+    for task_config in task_configs:
+        # Check if a task with the same name already exists in the database
+        existing_tasks = task_repository.get_all()  # Adjust if needed to filter by name
+        
+        # Compare existing tasks with the new one to avoid duplication
+        duplicate_task = None
+        for existing_task in existing_tasks:
+            if existing_task.task_name == task_config.task_name:
+                duplicate_task = existing_task
+                break
+        
+        if duplicate_task:
+            print(f"Task '{task_config.task_name}' already exists, skipping database addition...")
+    
+            # Add the task to the orchestrator
+            await task_orchestrator.add_task(task_config)
+            continue
 
-    for task_config in task_configs: 
-        await task_orchestrator.add_task(task_config)
+        # Save the new task to the database using the repository
+        task_repository.create(task_config)
 
 # Add to task orchestrator
-create_task(add_tasks())
+asyncio.create_task(add_tasks())
 
 # Insert on database
 with get_session() as session:

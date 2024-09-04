@@ -1,5 +1,4 @@
 # app/schemas.py
-
 from pydantic import BaseModel, Field, UUID4
 from typing import Tuple, Dict, Callable, Optional, Any
 from datetime import datetime
@@ -19,6 +18,12 @@ class RequestLogBase(BaseModel):
 
 class RequestLogCreate(RequestLogBase):
     pass
+
+class TaskCreate(BaseModel):
+    task_name: str
+    task_type: str
+    task_is_active: bool
+    task_details: dict
 
 class TaskLogCreate(BaseModel):
     talo_name: str
@@ -48,6 +53,17 @@ class TaskRead(BaseModel):
     class Config:
         from_atributes = True
 
+class TaskResponse(BaseModel):
+    task_id: UUID4
+    task_created_at: str
+    task_name: str
+    task_type: str
+    task_is_active: bool
+    task_details: dict
+
+    class Config:
+        from_atributes = True
+
 class TaskConfig(BaseModel):
     schedule_type: str
     schedule_params: Dict[str, Any] = Field(default_factory=dict)
@@ -56,3 +72,29 @@ class TaskConfig(BaseModel):
     task_callable: Callable
     task_args: Tuple[Any] = ()
     task_details: Dict[str, Any] = Field(default_factory=dict)
+    
+    def __eq__(self, other):
+        if not isinstance(other, TaskConfig):
+            return NotImplemented
+
+        return (
+            self.schedule_type == other.schedule_type and
+            self.schedule_params == other.schedule_params and
+            self.task_name == other.task_name and
+            self.task_type == other.task_type and
+            self.task_callable == other.task_callable and
+            self.task_args == other.task_args and
+            self.task_details == other.task_details
+        )
+
+    def __hash__(self):
+        # Implementing __hash__ allows TaskConfig to be used in sets or as dict keys
+        return hash((
+            self.schedule_type, 
+            tuple(sorted(self.schedule_params.items())), 
+            self.task_name, 
+            self.task_type, 
+            self.task_callable, 
+            self.task_args, 
+            tuple(sorted(self.task_details.items()))
+        ))

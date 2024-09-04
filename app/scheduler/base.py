@@ -1,8 +1,12 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.jobstores.base import JobLookupError
+from apscheduler.schedulers.base import BaseScheduler
+from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 
 from typing import Dict, List, Tuple, Any, Callable
 from datetime import datetime, timedelta
@@ -10,7 +14,7 @@ import traceback
 import asyncio
 import inspect
 
-from app.database.base import get_session
+from app.database.base import get_session, init_database, Database
 from app.database.models.logs import TaskLog
 from app.schemas import TaskConfig
 from app.utils.scheduler import create_scheduler
@@ -45,7 +49,12 @@ def validate_cron_kwargs(kwargs: Dict[str, Any]):
 
 
 # Generic function to set up scheduler
-def setup_scheduler(scheduler, job_function, schedule_params, task_type="interval"):
+def setup_scheduler(
+    scheduler: BaseScheduler, 
+    job_function: Callable, 
+    schedule_params: Dict[str, Any], 
+    task_type: str = "interval"
+):
     """
     Set up the scheduler to run a specified job function based on the given schedule type.
 
@@ -70,8 +79,30 @@ def setup_scheduler(scheduler, job_function, schedule_params, task_type="interva
     
     else:
         raise ValueError("Unsupported schedule_type. Use 'interval' or 'cron'.")
-
+    
     scheduler.add_job(job_function, trigger)
+
+# Define a function to create the appropriate scheduler
+def create_scheduler(database: Database, schedule_type):
+    jobstores = {
+        'default': SQLAlchemyJobStore(engine=database.engine)
+    }
+
+    executors = {
+        'default': ThreadPoolExecutor(max_workers=20),
+        'process': ProcessPoolExecutor(max_workers=5)
+    }
+
+    if schedule_type == "background":
+        return BackgroundScheduler(
+            jobstores=jobstores, executors=executors
+        )
+    elif schedule_type == "asyncio":
+        return AsyncIOScheduler(
+            jobstores=jobstores, executors=executors
+        )
+    else:
+        raise ValueError(f"Invalid schedule type: {schedule_type}")
 
 async def run_task(
     task_name: str, 
@@ -123,35 +154,31 @@ async def run_task(
             task_log.talo_end_time = datetime.now()
             session.commit()
 
-def create_scheduled_job(
-    task_name: str, 
-    task_type: str, 
-    task_callable: Callable, 
-    *task_args: Tuple[Any],
-    **task_details: Dict[str, Any]
-) -> Callable:
-    """
-    Create a job function for scheduling.
-    """
-    async def job_function():
-        await run_task(task_name, task_type, task_callable, *task_args, **task_details)
+class ScheduledTask:
+    def __init__(self, task_config: TaskConfig):
+        self.task_config = task_config
 
-    def run_job():
-        # Create a new event loop if none exists for the current thread
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            loop.run_until_complete(job_function())
-        finally:
-            loop.close()
+    async def run(self):
+        await run_task(
+            self.task_config.task_name,
+            self.task_config.task_type,
+            self.task_config.task_callable,
+            **self.task_config.task_args,
+            **self.task_config.task_details
+        )
 
-    return run_job
+    async def schedule(self, scheduler):
+        job_function=self.run
+        setup_scheduler(
+            scheduler, job_function, self.task_config.schedule_params, self.task_config.task_type
+        )
 
 class TaskOrchestrator:
     def __init__(self):
+        database=init_database()
         self.schedulers = {
-            "background": create_scheduler("background"),
-            "asyncio": create_scheduler("asyncio")
+            "background": create_scheduler(database, "background"),
+            "asyncio": create_scheduler(database, "asyncio")
         }
 
     def start(self):
@@ -164,18 +191,10 @@ class TaskOrchestrator:
 
     async def add_task(self, task_config: TaskConfig):
         scheduler=self.schedulers.get(task_config.schedule_type, None)
-        
-        if scheduler:
-            job_function = create_scheduled_job(
-                task_name=task_config.task_name,
-                task_type=task_config.task_type,
-                task_callable=task_config.task_callable,
-                task_details=task_config.task_details
-            )
 
-            setup_scheduler(
-                scheduler, job_function, task_config.schedule_params, task_config.task_type
-            )
+        if scheduler:
+            task=ScheduledTask(task_config)
+            await task.schedule(scheduler)
 
         else:
             invalid_message=f"Invalid scheduler type: {task_config.schedule_type}."
@@ -216,4 +235,4 @@ class TaskRegister:
                 task_is_active=True
             )
             # Register the task using the repository's create method
-            self.task_repository.create(task_data)
+            self.task_repository.create(task_data.model_dump())

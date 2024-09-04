@@ -17,8 +17,8 @@ from app.middlewares.logs import AsyncRequestLoggingMiddleware
 from app.utils.migrations import generate_migrations, run_migrations
 
 from app.scheduler.bundler import task_orchestrator
+
 from app.rate_limiter import limiter
-from app.routers.bundler import routers
 
 from app.config import settings
 
@@ -48,6 +48,7 @@ app = FastAPI(
     redoc_url=f"{settings.API_V1_STR}/redoc",
 )
 
+from app.routers.bundler import routers
 for router in routers:
     app.include_router(router, prefix=settings.API_V1_STR)
 
