@@ -120,7 +120,7 @@ class ScheduledTask:
             task_details (Dict[str, Any]): Additional details about the task (e.g., parameters used).
             task_callable (Callable): The function or method that executes the task logic.
             *args: Positional arguments to pass to the task_callable.
-            **kwargs: Keyword arguments to pass to the task_callable.
+            **kwargs: Keyword  arguments to pass to the task_callable.
         """
         with get_session() as session:
             task_log = TaskLog(

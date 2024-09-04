@@ -53,6 +53,7 @@ class Settings(BaseSettings):
         'month': '*',       # Every month
         'day_of_week': '*'  # Every day of the week
     }
+    REQUEST_CLEANUP_MAX_ROWS: int = 5000000
     
     # Define the age of request logs to be cleaned up
     REQUEST_CLEANUP_AGE: timedelta = timedelta(days=7)
@@ -68,6 +69,7 @@ class Settings(BaseSettings):
     
     # Define the age of task logs to be cleaned up
     TASK_CLEANUP_AGE: timedelta = timedelta(days=30)
+    TASK_CLEANUP_MAX_ROWS: int = 5000000
 
     class Config:
         env_file = ".env"

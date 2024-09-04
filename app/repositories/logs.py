@@ -50,6 +50,14 @@ class RequestLogRepository(BaseRepository):
         delete_query = delete(RequestLog).where(RequestLog.relo_inserted_at < cutoff_date)
         self.session.execute(delete_query)
         self.session.commit()
+        
+    def delete_excess_logs(self, max_rows: int):
+        query = self.session.query(RequestLog).order_by(RequestLog.inserted_at)
+        total_rows = query.count()
+        if total_rows > max_rows:
+            delete_query = query.delete(synchronize_session="fetch")
+            self.session.execute(delete_query)
+            self.session.commit()
 
 
 async def get_request_logs_repository() -> RequestLogRepository:
