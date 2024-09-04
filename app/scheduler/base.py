@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 import traceback
 import asyncio
 import inspect
+import asyncio
 
 from app.database.base import get_session, init_database, Database
 from app.database.models.logs import TaskLog
@@ -103,69 +104,62 @@ def create_scheduler(database: Database, schedule_type):
         )
     else:
         raise ValueError(f"Invalid schedule type: {schedule_type}")
-
-async def run_task(
-    task_name: str, 
-    task_type: str,  
-    task_callable: Callable, 
-    *task_args,
-    **task_details
-):
-    """
-    Run a task and log its execution details in the TaskLog table.
-
-    Args:
-        task_name (str): The name of the task being executed.
-        task_type (str): The type of task (e.g., 'cleanup', 'data_processing').
-        task_details (Dict[str, Any]): Additional details about the task (e.g., parameters used).
-        task_callable (Callable): The function or method that executes the task logic.
-        *args: Positional arguments to pass to the task_callable.
-        **kwargs: Keyword arguments to pass to the task_callable.
-    """
-    with get_session() as session:
-        task_log = TaskLog(
-            talo_name=task_name,
-            talo_type=task_type,
-            talo_details=task_details,
-            talo_start_time=datetime.now(),
-            talo_status='running'
-        )
-        session.add(task_log)
-        session.commit()
-
-        try:
-            # Determine if task_callable is asynchronous
-            if inspect.iscoroutinefunction(task_callable):
-                result = await task_callable(*task_args, **task_details)
-            else:
-                result = task_callable(*task_args, **task_details)
-
-            task_log.talo_success = True
-            task_log.talo_status = 'completed'
-            task_log.talo_details['result'] = result
-
-        except Exception as e:
-            task_log.talo_success = False
-            task_log.talo_status = 'failed'
-            task_log.talo_error_message = str(e)
-            task_log.talo_error_trace = traceback.format_exc()
-
-        finally:
-            task_log.talo_end_time = datetime.now()
-            session.commit()
+    
 
 class ScheduledTask:
     def __init__(self, task_config: TaskConfig):
         self.task_config = task_config
 
-    async def run(self):
-        await run_task(
-            self.task_config.task_name,
-            self.task_config.task_type,
-            self.task_config.task_callable,
-            **self.task_config.task_args,
-            **self.task_config.task_details
-        )
+    def run(self):
+        """
+        Run a task and log its execution details in the TaskLog table.
+
+        Args:
+            task_name (str): The name of the task being executed.
+            task_type (str): The type of task (e.g., 'cleanup', 'data_processing').
+            task_details (Dict[str, Any]): Additional details about the task (e.g., parameters used).
+            task_callable (Callable): The function or method that executes the task logic.
+            *args: Positional arguments to pass to the task_callable.
+            **kwargs: Keyword arguments to pass to the task_callable.
+        """
+        with get_session() as session:
+            task_log = TaskLog(
+                talo_name=self.task_config.task_name,
+                talo_type=self.task_config.task_type,
+                talo_details=self.task_config.task_details,
+                talo_start_time=datetime.now(),
+                talo_status='running'
+            )
+            session.add(task_log)
+            session.commit()
+
+            try:
+                # Determine if task_callable is asynchronous
+                if inspect.iscoroutinefunction(self.task_config.task_callable):
+                    result = asyncio.run(
+                        self.task_config.task_callable(
+                            *self.task_config.task_args, **self.task_config.task_details
+                        )
+                    ) 
+                else:
+                    result = self.task_config.task_callable(
+                        *self.task_config.task_args, 
+                        **self.task_config.task_details
+                    )
+
+                task_log.talo_success = True
+                task_log.talo_status = 'completed'
+                task_log.talo_details['result'] = result
+
+            except Exception as e:
+                task_log.talo_success = False
+                task_log.talo_status = 'failed'
+                task_log.talo_error_message = str(e)
+                task_log.talo_error_trace = traceback.format_exc()
+
+            finally:
+                task_log.talo_end_time = datetime.now()
+                session.commit()
 
     async def schedule(self, scheduler):
         job_function=self.run
