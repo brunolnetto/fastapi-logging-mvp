@@ -1,6 +1,6 @@
 APScheduler==3.10.4
 SQLAlchemy-Utils==0.41.2
-SQLAlchemy==2.0.32
+SQLAlchemy==2.0.34
 asyncpg==0.29.0
 fastapi==0.112.2
 psycopg2-binary==2.9.9
