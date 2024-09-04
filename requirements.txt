@@ -8,4 +8,4 @@ pydantic-settings==2.4.0
 pydantic==2.8.2
 python-dotenv==1.0.1
 slowapi[redis]==0.1.9
-uvicorn==0.22.0
+uvicorn==0.30.6
