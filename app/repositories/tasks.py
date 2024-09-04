@@ -12,7 +12,7 @@ from app.repositories.base import BaseRepository
 class TaskRepository(BaseRepository):
     def __init__(self, session: Session):
         self.session = session
-    
+
     def create(self, task_data: Dict[str, Any]) -> Task:
         # Check if the task already exists
         existing_task = self.session.execute(

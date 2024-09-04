@@ -10,6 +10,7 @@ from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 
 from typing import Dict, List, Tuple, Any, Callable
 from datetime import datetime, timedelta
+from jinja2 import Template
 import traceback
 import asyncio
 import inspect
@@ -124,6 +125,7 @@ class ScheduledTask:
         """
         with get_session() as session:
             task_log = TaskLog(
+                talo_task_id=self.task_config.task_id,
                 talo_name=self.task_config.task_name,
                 talo_type=self.task_config.task_type,
                 talo_details=self.task_config.task_details,
@@ -134,7 +136,6 @@ class ScheduledTask:
             session.commit()
 
             try:
-                # Determine if task_callable is asynchronous
                 if inspect.iscoroutinefunction(self.task_config.task_callable):
                     result = asyncio.run(
                         self.task_config.task_callable(
@@ -148,7 +149,7 @@ class ScheduledTask:
                     )
 
                 task_log.talo_success = True
-                task_log.talo_status = 'completed'
+                task_log.talo_status = 'success'
                 task_log.talo_details['result'] = result
 
             except Exception as e:
@@ -223,10 +224,15 @@ class TaskRegister:
         for config in task_configs:
             # Prepare task data using TaskCreate Pydantic model
             task_data = TaskCreate(
+                task_id=config.task_id,
+                task_schedule_type=config.schedule_type,
+                task_schedule_params=config.schedule_params,
                 task_name=config.task_name,
+                task_callable=config.task_callable.__name__,
                 task_type=config.task_type,
-                task_details=config.task_details,
-                task_is_active=True
+                task_is_active=True,
+                task_args=config.task_args,
+                task_details=config.task_details
             )
             # Register the task using the repository's create method
             self.task_repository.create(task_data.model_dump())

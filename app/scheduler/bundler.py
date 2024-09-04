@@ -24,7 +24,7 @@ async def add_tasks():
     
     task_repository = get_task_repository()
     
-    for task_config in task_configs:
+    for index, task_config in enumerate(task_configs):
         # Check if a task with the same name already exists in the database
         existing_tasks = task_repository.get_all()  # Adjust if needed to filter by name
         
@@ -37,7 +37,15 @@ async def add_tasks():
         
         if duplicate_task:
             print(f"Task '{task_config.task_name}' already exists, skipping database addition...")
-    
+            
+            print('antes')
+            print(task_configs[index].task_id)
+
+            task_configs[index].task_id = duplicate_task.task_id
+
+            print('depois')
+            print(task_configs[index].task_id)
+
             # Add the task to the orchestrator
             await task_orchestrator.add_task(task_config)
             continue

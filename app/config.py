@@ -56,7 +56,7 @@ class Settings(BaseSettings):
     REQUEST_CLEANUP_MAX_ROWS: int = 5000000
     
     # Define the age of request logs to be cleaned up
-    REQUEST_CLEANUP_AGE: timedelta = timedelta(days=7)
+    REQUEST_CLEANUP_AGE: Dict[str, Any] = {"days": 7}
 
     # Define cron parameters for task logs cleanup
     TASK_CLEANUP_CRON_KWARGS: Dict[str, str] = {

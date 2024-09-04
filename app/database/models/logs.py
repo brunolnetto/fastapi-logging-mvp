@@ -36,7 +36,12 @@ class TaskLog(Base):
     talo_id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
 
     # Foreign key referencing the task_id in the Task table
-    talo_task_id = Column(UUID(as_uuid=True), ForeignKey('tasks.task_id'), index=True)
+    talo_task_id = Column(
+        UUID(as_uuid=True), 
+        ForeignKey('tasks.task_id'), 
+        index=True,
+        nullable=False
+    )
 
     talo_name = Column(String, index=True)
     talo_status = Column(String, index=True)

@@ -2,6 +2,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from datetime import timedelta
 import asyncio
+from uuid import uuid4
 
 from app.database.base import get_session
 from app.repositories.logs import RequestLogRepository, TaskLogRepository
@@ -40,6 +41,7 @@ async def cleanup_task_logs(time_delta: timedelta, max_rows: int = None):
 
 # Schedule the task to run at regular intervals
 cleanup_request_config=TaskConfig(
+    task_id=uuid4(),
     schedule_type='asyncio',
     schedule_params=settings.REQUEST_CLEANUP_CRON_KWARGS,
     task_name=f"Cleanup request logs with schedule period {settings.REQUEST_CLEANUP_CRON_KWARGS}",
@@ -53,6 +55,7 @@ cleanup_request_config=TaskConfig(
 
 # Schedule the task to run at regular intervals
 cleanup_task_config=TaskConfig(
+    task_id=uuid4(),
     schedule_type='asyncio',
     schedule_params=settings.TASK_CLEANUP_CRON_KWARGS,
     task_name=f"Cleanup task logs with schedule period {settings.TASK_CLEANUP_CRON_KWARGS}",

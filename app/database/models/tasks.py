@@ -8,16 +8,17 @@ from sqlalchemy.orm import relationship
 
 from app.database.base import Base
 
-
 class Task(Base):
     __tablename__ = 'tasks'
 
     task_id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     task_created_at = Column(DateTime(timezone=True), server_default=func.now())
+    task_schedule_type = Column(String, index=True)
+    task_schedule_params = Column(JSONB)
     task_name = Column(String, index=True)
+    task_callable = Column(String, index=True)
     task_type = Column(String)
     task_is_active = Column(Boolean, default=True)
-    task_details = Column(JSONB)
 
     # Define a relationship with TaskLog model (one-to-many)
     logs = relationship("TaskLog", backref="task")

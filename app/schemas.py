@@ -36,35 +36,29 @@ class TaskLogCreate(BaseModel):
     talo_error_message: Optional[str] = None
     talo_error_trace: Optional[str] = None
 
-class TaskCreate(BaseModel):
-    task_name: str = Field(..., title="Task Name", description="The name of the task")
-    task_type: str = Field(..., title="Task Type", description="The type of the task")
-    task_is_active: Optional[bool] = Field(True, title="Task Active", description="Indicates if the task is active")
-    task_details: Optional[Dict[str, Any]] = Field({}, title="Task Details", description="Additional details about the task")
-
-class TaskRead(BaseModel):
+class TaskBase(BaseModel):
     task_id: UUID4 = Field(default_factory=uuid4, title="Task ID", description="The unique identifier of the task")
-    task_created_at: datetime = Field(default_factory=datetime.utcnow, title="Task Created At", description="The timestamp when the task was created")
+    task_schedule_type: str = Field(..., title="Task Schedule Type", description="The type of the task schedule")
+    task_schedule_params: Dict[str, Any] = Field(..., title="Task Schedule Params", description="The parameters for the task schedule")
     task_name: str = Field(..., title="Task Name", description="The name of the task")
+    task_callable: str = Field(..., title="Task Callable", description="The function or method that executes the task logic")
     task_type: str = Field(..., title="Task Type", description="The type of the task")
     task_is_active: Optional[bool] = Field(True, title="Task Active", description="Indicates if the task is active")
-    task_details: Optional[Dict[str, Any]] = Field({}, title="Task Details", description="Additional details about the task")
+
+class TaskCreate(TaskBase):
+    pass
+
+class TaskRead(TaskBase):
 
     class Config:
         from_atributes = True
 
-class TaskResponse(BaseModel):
-    task_id: UUID4
-    task_created_at: str
-    task_name: str
-    task_type: str
-    task_is_active: bool
-    task_details: dict
-
+class TaskResponse(TaskBase):
     class Config:
         from_atributes = True
 
 class TaskConfig(BaseModel):
+    task_id: UUID4 = Field(default_factory=uuid4)
     schedule_type: str
     schedule_params: Dict[str, Any] = Field(default_factory=dict)
     task_name: str
