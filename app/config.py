@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     TASK_CLEANUP_CRON_KWARGS: Dict[str, str] = {
         'minute': '0',
         'hour': '0',        # Runs at midnight
-        'day': '1',         # Every first day of the month
+        'day': '*',         # Every first day of the month
         'month': '*',       # Every month
         'day_of_week': '*'  # Every day of the week
     }
