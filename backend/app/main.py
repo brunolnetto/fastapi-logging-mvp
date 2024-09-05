@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+
 from contextlib import asynccontextmanager
 
 from slowapi import _rate_limit_exceeded_handler
@@ -45,3 +47,17 @@ async def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(status_code=429, content=detail_dict)
 
 app.add_middleware(AsyncRequestLoggingMiddleware)
+
+# Add CORS middleware
+origins = [
+    "http://frontend:5000",
+    "https://frontend:5000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)

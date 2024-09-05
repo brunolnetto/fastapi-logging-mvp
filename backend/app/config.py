@@ -3,8 +3,15 @@ from pydantic_settings import BaseSettings
 from pydantic import Field, PostgresDsn, field_validator, ValidationInfo
 from typing import Optional, List, Dict, Any
 from datetime import timedelta
+from os import path, getcwd
+
+current_dir = getcwd()
 
 class Settings(BaseSettings):
+    class Config:
+        env_file = path.join("backend", ".env")
+        env_file_encoding = 'utf-8'
+    
     # API Information
     API_V1_STR: str = "/api"
 
@@ -20,9 +27,9 @@ class Settings(BaseSettings):
     @classmethod
     def database_url(cls, v: Optional[str], values: ValidationInfo):
         if isinstance(v, str):
-            print("Loading SQLALCHEMY_DATABASE_URI from .docker.env file ...")
+            print("Loading SQLALCHEMY_DATABASE_URI from .env file ...")
             return v
-        
+        print(values.data)
         print("Creating SQLALCHEMY_DATABASE_URI from .env file ...")
         return PostgresDsn.build(
             scheme="postgresql",
@@ -70,9 +77,6 @@ class Settings(BaseSettings):
     # Define the age of task logs to be cleaned up
     TASK_CLEANUP_AGE: timedelta = timedelta(days=30)
     TASK_CLEANUP_MAX_ROWS: int = 5
-
-    class Config:
-        env_file = ".env"
 
 # Create an instance of the settings
 settings = Settings()

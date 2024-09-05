@@ -59,11 +59,17 @@ lint: ## perform inplace lint fixes
 	@ruff check --unsafe-fixes --fix .
 	@black $(shell git ls-files '*.py')
 
+run: ## Run the application. Usage: make run
+	uvicorn backend.app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+
 report: test ## Generate coverage report. Usage: make report
 	coverage report --omit=$(OMIT_PATHS) --show-missing
 
 ps: ## List all running containers. Usage: make ps
 	docker compose ps -a
+
+build: ## Build the application. Usage: make build
+	docker compose build
 
 up: ## Start the application. Usage: make up
 	docker compose up -d
