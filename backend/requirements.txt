@@ -4,7 +4,7 @@ fastapi==0.112.2
 jinja2
 psycopg2-binary==2.9.9
 pydantic-settings==2.4.0
-pydantic==2.8.2
+pydantic==2.9.0
 python-dotenv==1.0.1
 SQLAlchemy-Utils==0.41.2
 SQLAlchemy==2.0.34
