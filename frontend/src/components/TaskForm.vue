@@ -11,6 +11,7 @@
   </template>
   
   <script>
+  import { ref } from 'vue';
   import { useTaskStore } from '@/store/taskStore';
   
   export default {
