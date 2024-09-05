@@ -14,6 +14,7 @@ from backend.app.config import settings
 
 Base = declarative_base()
 
+
 class Database:
     """
     This class represents a database connection and session management object.
@@ -27,10 +28,10 @@ class Database:
         self.uri = uri
         self.engine = create_engine(
             uri,
-            poolclass=pool.QueuePool,               # Use connection pooling
-            pool_size=20,                           # Adjust pool size based on your workload
-            max_overflow=10,                        # Adjust maximum overflow connections
-            pool_recycle=3600,                      # Periodically recycle connections (optional)
+            poolclass=pool.QueuePool,  # Use connection pooling
+            pool_size=20,  # Adjust pool size based on your workload
+            max_overflow=10,  # Adjust maximum overflow connections
+            pool_recycle=3600,  # Periodically recycle connections (optional)
         )
         self.session_maker = sessionmaker(bind=self.engine, expire_on_commit=False)
 
@@ -49,9 +50,9 @@ class Database:
             if not database_exists(self.uri):
                 # Create the database engine and session maker
                 create_database(self.uri)
-                print(f'Database {settings.POSTGRES_DBNAME} created!')
+                print(f"Database {settings.POSTGRES_DBNAME} created!")
             else:
-                print(f'Database {settings.POSTGRES_DBNAME} already exists!')
+                print(f"Database {settings.POSTGRES_DBNAME} already exists!")
 
         except OperationalError as e:
             print(f"Error creating to database: {e}")
@@ -69,7 +70,7 @@ class Database:
         except OperationalError as e:
             print(f"Error connecting to the database: {e}")
 
-    def create_tables(self):        
+    def create_tables(self):
         """
         Connects to a PostgreSQL database using environment variables for connection details.
 
@@ -84,7 +85,7 @@ class Database:
                 Base.metadata.create_all(self.engine)
 
             tables = self.get_table_names()
-            
+
             print(f"Tables {tables} created!")
 
         except Exception as e:
@@ -93,7 +94,7 @@ class Database:
     def get_table_names(self):
         inspector = inspect(self.engine)
         return inspector.get_table_names()
-    
+
     def print_tables(self):
         """
         Print the available tables in the database.
@@ -135,7 +136,7 @@ class Database:
             self.print_tables()
         except Exception as e:
             print(f"Error print available tables: {e}")
-            
+
     def disconnect(self):
         """
         Clean up and close the database connection and session maker.
@@ -147,7 +148,6 @@ class Database:
         except Exception as e:
             print(f"Error closing database connections: {str(e)}")
 
-
     def __repr__(self):
         return f"<Database(uri={self.uri})>"
 
@@ -155,18 +155,21 @@ class Database:
 # Load environment variables from the .env file
 database = None
 
+
 def init_database() -> Database:
     global database
-    
+
     database = Database(settings.SQLALCHEMY_DATABASE_URI)
     database.init()
 
     return database
 
+
 def disconnect_database() -> Database:
     global database
-    
+
     database.disconnect()
+
 
 async def get_db():
     """
@@ -182,6 +185,7 @@ async def get_db():
 
     yield database
 
+
 @contextmanager
 def get_session() -> Generator[Session, None, None]:
     """
@@ -192,7 +196,7 @@ def get_session() -> Generator[Session, None, None]:
     """
     if database is None:
         init_database()
-    
+
     with database.session_maker() as session:
         try:
             yield session

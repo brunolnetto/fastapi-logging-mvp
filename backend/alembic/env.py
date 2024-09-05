@@ -6,6 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.config import settings
+
 # Import your SQLAlchemy models
 from app.database.base import Base
 
@@ -23,7 +24,8 @@ target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
-config.set_main_option('sqlalchemy.url', settings.SQLALCHEMY_DATABASE_URI)
+config.set_main_option("sqlalchemy.url", settings.SQLALCHEMY_DATABASE_URI)
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
@@ -38,6 +40,7 @@ def run_migrations_offline() -> None:
     with context.begin_transaction():
         context.run_migrations()
 
+
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
     connectable = engine_from_config(
@@ -48,13 +51,11 @@ def run_migrations_online() -> None:
 
     # Use synchronous connection for migrations
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()

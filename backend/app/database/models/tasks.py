@@ -7,10 +7,13 @@ from sqlalchemy.orm import relationship
 
 from backend.app.database.base import Base
 
-class Task(Base):
-    __tablename__ = 'tasks'
 
-    task_id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+class Task(Base):
+    __tablename__ = "tasks"
+
+    task_id = Column(
+        UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4
+    )
     task_created_at = Column(DateTime(timezone=True), server_default=func.now())
     task_schedule_type = Column(String, index=True)
     task_schedule_params = Column(JSONB)
@@ -20,7 +23,9 @@ class Task(Base):
     task_is_active = Column(Boolean, default=True)
 
     # Define a relationship with TaskLog model (one-to-many)
-    logs = relationship("TaskLog", back_populates="task", cascade="all, delete", passive_updates=False)
+    logs = relationship(
+        "TaskLog", back_populates="task", cascade="all, delete", passive_updates=False
+    )
 
     def __repr__(self):
         params = f"id={self.task_id}, name={self.task_name}, type={self.task_type}, active={self.task_is_active}"

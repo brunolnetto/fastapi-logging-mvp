@@ -1,39 +1,37 @@
-# Use Node.js as base image for the frontend
-FROM node:18 AS build
-
-# Set working directory to /app
+# Stage 1: Install dependencies
+FROM node:18 AS dependencies
 WORKDIR /app
 
-# Install pnpm globally
-RUN npm install -g pnpm
-
-# Copy package.json and pnpm-lock.yaml files to the container
+# Copy package.json and lock files to the container
 COPY package.json pnpm-lock.yaml ./
 
-# Install frontend dependencies using pnpm
+# Install dependencies using pnpm
+RUN npm install -g pnpm
 RUN pnpm install
 
-# Copy the rest of the frontend code
+# Stage 2: Build the application
+FROM node:18 AS build
+WORKDIR /app
+
+# Copy the installed dependencies from the previous stage
+COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 
 # Build the Vue.js app
 RUN pnpm run build
 
-# Use a lightweight server to serve the built app
-FROM node:18 AS production
-
-# Install `serve` globally
-RUN npm install -g serve
-
-# Set working directory
+# Stage 3: Serve the built app
+FROM node:18-alpine AS production
 WORKDIR /app
 
-# Copy the built frontend app from the previous stage
-COPY --from=build /app/dist /app/dist
+# Install a lightweight HTTP server
+RUN npm install -g serve
 
-# Expose port 5000 for serve
+# Copy the built files to the production stage
+COPY --from=build /app/dist ./dist
+
+# Expose the port for the server
 EXPOSE 5000
 
-# Serve the frontend app using `serve`
+# Serve the app
 CMD ["serve", "-s", "dist", "-l", "5000"]
-

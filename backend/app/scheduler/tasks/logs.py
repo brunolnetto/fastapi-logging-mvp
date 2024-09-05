@@ -6,6 +6,7 @@ from backend.app.repositories.logs import RequestLogRepository, TaskLogRepositor
 from backend.app.schemas import TaskConfig
 from backend.app.config import settings
 
+
 async def cleanup_request_logs(time_delta: timedelta, max_rows: int = None):
     """
     Cleans up requests logs based on either time or table row count.
@@ -20,6 +21,7 @@ async def cleanup_request_logs(time_delta: timedelta, max_rows: int = None):
             await request_log_repository.delete_excess_logs(max_rows)
         else:
             await request_log_repository.delete_old_logs(time_delta)
+
 
 async def cleanup_task_logs(time_delta: timedelta, max_rows: int = None):
     """
@@ -36,30 +38,31 @@ async def cleanup_task_logs(time_delta: timedelta, max_rows: int = None):
         else:
             await task_log_repository.delete_old_logs(time_delta)
 
+
 # Schedule the task to run at regular intervals
-cleanup_request_config=TaskConfig(
+cleanup_request_config = TaskConfig(
     task_id=uuid4(),
-    schedule_type='asyncio',
+    schedule_type="asyncio",
     schedule_params=settings.REQUEST_CLEANUP_CRON_KWARGS,
     task_name=f"Cleanup request logs with schedule period {settings.REQUEST_CLEANUP_CRON_KWARGS}",
     task_type="cron",
     task_callable=cleanup_request_logs,
     task_args=[
-        settings.REQUEST_CLEANUP_AGE, 
+        settings.REQUEST_CLEANUP_AGE,
         settings.REQUEST_CLEANUP_MAX_ROWS,
     ],
 )
 
 # Schedule the task to run at regular intervals
-cleanup_task_config=TaskConfig(
+cleanup_task_config = TaskConfig(
     task_id=uuid4(),
-    schedule_type='asyncio',
+    schedule_type="asyncio",
     schedule_params=settings.TASK_CLEANUP_CRON_KWARGS,
     task_name=f"Cleanup task logs with schedule period {settings.TASK_CLEANUP_CRON_KWARGS}",
     task_type="cron",
     task_callable=cleanup_task_logs,
     task_args=[
-        settings.REQUEST_CLEANUP_AGE, 
+        settings.REQUEST_CLEANUP_AGE,
         settings.REQUEST_CLEANUP_MAX_ROWS,
     ],
 )

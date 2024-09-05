@@ -7,11 +7,16 @@ from sqlalchemy.orm import relationship
 
 from backend.app.database.base import Base
 
-class RequestLog(Base):
-    __tablename__ = 'request_logs'
 
-    relo_id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    relo_inserted_at = Column(DateTime(timezone=True), index=True, server_default=func.now())
+class RequestLog(Base):
+    __tablename__ = "request_logs"
+
+    relo_id = Column(
+        UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4
+    )
+    relo_inserted_at = Column(
+        DateTime(timezone=True), index=True, server_default=func.now()
+    )
     relo_method = Column(String, index=True)
     relo_url = Column(String, index=True)
     relo_headers = Column(JSONB)
@@ -24,12 +29,12 @@ class RequestLog(Base):
     relo_response_size = Column(Integer, index=True)
 
     def __repr__(self):
-        params=f"id={self.relo_id}, method={self.relo_method}, url={self.relo_url}, status_code={self.relo_status_code}"
+        params = f"id={self.relo_id}, method={self.relo_method}, url={self.relo_url}, status_code={self.relo_status_code}"
         return f"<RequestLog({params})>"
 
 
 class TaskLog(Base):
-    __tablename__ = 'task_logs'
+    __tablename__ = "task_logs"
 
     talo_id = Column(
         UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4
@@ -37,10 +42,11 @@ class TaskLog(Base):
 
     # Foreign key referencing the task_id in the Task table
     talo_task_id = Column(
-            UUID(as_uuid=True), 
-            ForeignKey('tasks.task_id', ondelete='CASCADE', onupdate='CASCADE'), 
-            index=True, nullable=False
-        )
+        UUID(as_uuid=True),
+        ForeignKey("tasks.task_id", ondelete="CASCADE", onupdate="CASCADE"),
+        index=True,
+        nullable=False,
+    )
 
     talo_name = Column(String, index=True)
     talo_status = Column(String, index=True)
@@ -52,14 +58,9 @@ class TaskLog(Base):
     talo_error_message = Column(Text, nullable=True)
     talo_error_trace = Column(Text, nullable=True)
     talo_inserted_at = Column(DateTime(timezone=True), server_default=func.now())
-    
+
     task = relationship("Task", back_populates="logs")
 
     def __repr__(self):
         params = f"id={self.talo_id}, name={self.talo_name}, status={self.talo_status}, success={self.talo_success}"
         return f"<TaskLog({params})>"
-
-    def __repr__(self):
-        params = f"id={self.talo_id}, name={self.talo_name}, status={self.talo_status}, success={self.talo_success}"
-        return f"<TaskLog({params})>"
-    

@@ -18,43 +18,70 @@ import inspect
 from backend.app.database.base import get_session, init_database, Database
 from backend.app.database.models.logs import TaskLog
 from backend.app.schemas import TaskConfig
-from backend.app.utils.scheduler import create_scheduler
 from backend.app.repositories.tasks import TaskRepository
 from backend.app.schemas import TaskCreate
+
 
 # Custom exception for invalid scheduling parameters
 class InvalidScheduleParameter(Exception):
     pass
 
+
 def validate_date_format(date_str: str, date_format: str = "%Y-%m-%d"):
     try:
         datetime.strptime(date_str, date_format)
     except ValueError:
-        raise InvalidScheduleParameter(f"Date '{date_str}' does not match format '{date_format}'")
+        raise InvalidScheduleParameter(
+            f"Date '{date_str}' does not match format '{date_format}'"
+        )
 
 
 def validate_interval_kwargs(kwargs: Dict[str, Any]):
-    allowed_keys = {'weeks', 'days', 'hours', 'minutes', 'seconds', 'start_date', 'end_date', 'timezone'}
-    invalid_keys = set(kwargs) - allowed_keys
-    if invalid_keys:
-        raise InvalidScheduleParameter(f"Invalid interval scheduling parameters: {invalid_keys}")
-
-def validate_cron_kwargs(kwargs: Dict[str, Any]):
     allowed_keys = {
-        'year', 'month', 'day', 'week', 'day_of_week', 'hour', 'minute', 'second',
-        'start_date', 'end_date', 'timezone', 'jitter'
+        "weeks",
+        "days",
+        "hours",
+        "minutes",
+        "seconds",
+        "start_date",
+        "end_date",
+        "timezone",
     }
     invalid_keys = set(kwargs) - allowed_keys
     if invalid_keys:
-        raise InvalidScheduleParameter(f"Invalid cron scheduling parameters: {invalid_keys}")
+        raise InvalidScheduleParameter(
+            f"Invalid interval scheduling parameters: {invalid_keys}"
+        )
+
+
+def validate_cron_kwargs(kwargs: Dict[str, Any]):
+    allowed_keys = {
+        "year",
+        "month",
+        "day",
+        "week",
+        "day_of_week",
+        "hour",
+        "minute",
+        "second",
+        "start_date",
+        "end_date",
+        "timezone",
+        "jitter",
+    }
+    invalid_keys = set(kwargs) - allowed_keys
+    if invalid_keys:
+        raise InvalidScheduleParameter(
+            f"Invalid cron scheduling parameters: {invalid_keys}"
+        )
 
 
 # Generic function to set up scheduler
 def setup_scheduler(
-    scheduler: BaseScheduler, 
-    job_function: Callable, 
-    schedule_params: Dict[str, Any], 
-    task_type: str = "interval"
+    scheduler: BaseScheduler,
+    job_function: Callable,
+    schedule_params: Dict[str, Any],
+    task_type: str = "interval",
 ):
     """
     Set up the scheduler to run a specified job function based on the given schedule type.
@@ -71,39 +98,36 @@ def setup_scheduler(
         validate_cron_kwargs(schedule_params)
         trigger = CronTrigger(**schedule_params)
     elif task_type == "date":
-        if 'run_date' not in schedule_params:
-            raise ValueError("For task_type 'date', 'run_date' must be specified in schedule_params.")
+        if "run_date" not in schedule_params:
+            raise ValueError(
+                "For task_type 'date', 'run_date' must be specified in schedule_params."
+            )
         trigger = DateTrigger(
-            run_date=schedule_params['run_date'], 
-            timezone=schedule_params.get('timezone')
+            run_date=schedule_params["run_date"],
+            timezone=schedule_params.get("timezone"),
         )
     else:
         raise ValueError("Unsupported schedule_type. Use 'interval' or 'cron'.")
 
     scheduler.add_job(job_function, trigger)
 
+
 # Define a function to create the appropriate scheduler
 def create_scheduler(database: Database, schedule_type):
-    jobstores = {
-        'default': SQLAlchemyJobStore(engine=database.engine)
-    }
+    jobstores = {"default": SQLAlchemyJobStore(engine=database.engine)}
 
     executors = {
-        'default': ThreadPoolExecutor(max_workers=20),
-        'process': ProcessPoolExecutor(max_workers=5)
+        "default": ThreadPoolExecutor(max_workers=20),
+        "process": ProcessPoolExecutor(max_workers=5),
     }
 
     if schedule_type == "background":
-        return BackgroundScheduler(
-            jobstores=jobstores, executors=executors
-        )
+        return BackgroundScheduler(jobstores=jobstores, executors=executors)
     elif schedule_type == "asyncio":
-        return AsyncIOScheduler(
-            jobstores=jobstores, executors=executors
-        )
+        return AsyncIOScheduler(jobstores=jobstores, executors=executors)
     else:
         raise ValueError(f"Invalid schedule type: {schedule_type}")
-    
+
 
 class ScheduledTask:
     def __init__(self, task_config: TaskConfig):
@@ -128,7 +152,7 @@ class ScheduledTask:
                 talo_type=self.task_config.task_type,
                 talo_details=self.task_config.task_details,
                 talo_start_time=datetime.now(),
-                talo_status='running'
+                talo_status="running",
             )
             session.add(task_log)
             session.commit()
@@ -139,20 +163,19 @@ class ScheduledTask:
                         self.task_config.task_callable(
                             *self.task_config.task_args, **self.task_config.task_details
                         )
-                    ) 
+                    )
                 else:
                     result = self.task_config.task_callable(
-                        *self.task_config.task_args, 
-                        **self.task_config.task_details
+                        *self.task_config.task_args, **self.task_config.task_details
                     )
 
                 task_log.talo_success = True
-                task_log.talo_status = 'success'
-                task_log.talo_details['result'] = result
+                task_log.talo_status = "success"
+                task_log.talo_details["result"] = result
 
             except Exception as e:
                 task_log.talo_success = False
-                task_log.talo_status = 'failed'
+                task_log.talo_status = "failed"
                 task_log.talo_error_message = str(e)
                 task_log.talo_error_trace = traceback.format_exc()
 
@@ -161,17 +184,21 @@ class ScheduledTask:
                 session.commit()
 
     async def schedule(self, scheduler):
-        job_function=self.run
+        job_function = self.run
         setup_scheduler(
-            scheduler, job_function, self.task_config.schedule_params, self.task_config.task_type
+            scheduler,
+            job_function,
+            self.task_config.schedule_params,
+            self.task_config.task_type,
         )
+
 
 class TaskOrchestrator:
     def __init__(self):
-        database=init_database()
+        database = init_database()
         self.schedulers = {
             "background": create_scheduler(database, "background"),
-            "asyncio": create_scheduler(database, "asyncio")
+            "asyncio": create_scheduler(database, "asyncio"),
         }
 
     def start(self):
@@ -183,15 +210,15 @@ class TaskOrchestrator:
             scheduler.shutdown()
 
     async def add_task(self, task_config: TaskConfig):
-        scheduler=self.schedulers.get(task_config.schedule_type, None)
+        scheduler = self.schedulers.get(task_config.schedule_type, None)
 
         if scheduler:
-            task=ScheduledTask(task_config)
+            task = ScheduledTask(task_config)
             await task.schedule(scheduler)
 
         else:
-            invalid_message=f"Invalid scheduler type: {task_config.schedule_type}."
-            available_message=f"Available schedulers: {self.schedulers.keys()}"
+            invalid_message = f"Invalid scheduler type: {task_config.schedule_type}."
+            available_message = f"Available schedulers: {self.schedulers.keys()}"
             raise ValueError(f"{invalid_message} {available_message}")
 
     def remove_task(self, schedule_type: str, task_name: str):
@@ -199,7 +226,9 @@ class TaskOrchestrator:
         try:
             scheduler.remove_job(task_name)
         except JobLookupError:
-            raise ValueError(f"Task '{task_name}' not found in scheduler '{schedule_type}'.")
+            raise ValueError(
+                f"Task '{task_name}' not found in scheduler '{schedule_type}'."
+            )
 
     def list_tasks(self, schedule_type: str):
         scheduler = self._get_scheduler(schedule_type)
@@ -213,6 +242,7 @@ class TaskOrchestrator:
             raise ValueError(f"{invalid_message} {available_message}")
 
         return scheduler
+
 
 class TaskRegister:
     def __init__(self, task_repository: TaskRepository):
@@ -230,7 +260,7 @@ class TaskRegister:
                 task_type=config.task_type,
                 task_is_active=True,
                 task_args=config.task_args,
-                task_details=config.task_details
+                task_details=config.task_details,
             )
 
             # Register the task using the repository's create method
