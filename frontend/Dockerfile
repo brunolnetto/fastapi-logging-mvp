@@ -1,5 +1,5 @@
 # Stage 1: Install dependencies
-FROM node:18 AS dependencies
+FROM node:20 AS dependencies
 WORKDIR /app
 
 # Copy package.json and lock files to the container
@@ -10,7 +10,7 @@ RUN npm install -g pnpm
 RUN pnpm install
 
 # Stage 2: Build the application
-FROM node:18 AS build
+FROM node:20 AS build
 WORKDIR /app
 
 # Copy the installed dependencies from the previous stage
@@ -21,7 +21,7 @@ COPY . .
 RUN pnpm run build
 
 # Stage 3: Serve the built app
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 WORKDIR /app
 
 # Install a lightweight HTTP server
