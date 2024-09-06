@@ -13,18 +13,20 @@ from backend.app.scheduler.bundler import task_orchestrator
 from backend.app.routers.bundler import routers
 from backend.app.config import settings
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    database=init_database()
-    
+    database = init_database()
+
     task_orchestrator.start()
     print("Scheduler started!")
 
     yield
     database.disconnect()
-    
+
     task_orchestrator.shutdown()
     print("Scheduler shutdown!")
+
 
 # Dependency to get the async session
 app = FastAPI(
@@ -40,19 +42,18 @@ for router in routers:
 # Register the rate limit exceeded handler
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+
 # Custom error handling example for rate limiting
 @app.exception_handler(RateLimitExceeded)
 async def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    detail_dict={"detail": "Too many requests, please slow down!"}
+    detail_dict = {"detail": "Too many requests, please slow down!"}
     return JSONResponse(status_code=429, content=detail_dict)
+
 
 app.add_middleware(AsyncRequestLoggingMiddleware)
 
 # Add CORS middleware
-origins = [
-    "http://frontend:5000",
-    "https://frontend:5000"
-]
+origins = ["http://frontend:5000", "https://frontend:5000"]
 
 app.add_middleware(
     CORSMiddleware,

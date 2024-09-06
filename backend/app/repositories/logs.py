@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from sqlalchemy import delete
 from sqlalchemy.future import select
-from typing import Dict, Any, List, Annotated,  Optional
+from typing import Dict, Any, List, Annotated, Optional
 from fastapi import Depends
 
 
@@ -12,6 +12,7 @@ from backend.app.database.models.logs import TaskLog, RequestLog
 from backend.app.schemas import TaskLogCreate, RequestLogCreate
 from backend.app.database.base import get_session
 from backend.app.repositories.base import BaseRepository
+
 
 class RequestLogRepository(BaseRepository):
     def create(self, log: RequestLogCreate) -> RequestLog:
@@ -42,10 +43,12 @@ class RequestLogRepository(BaseRepository):
 
     def delete_old_logs(self, time_delta: timedelta):
         cutoff_date = datetime.now() - time_delta
-        delete_query = delete(RequestLog).where(RequestLog.relo_inserted_at < cutoff_date)
+        delete_query = delete(RequestLog).where(
+            RequestLog.relo_inserted_at < cutoff_date
+        )
         self.session.execute(delete_query)
         self.session.commit()
-        
+
     def delete_excess_logs(self, max_rows: int):
         query = self.session.query(RequestLog).order_by(RequestLog.inserted_at)
         total_rows = query.count()
@@ -53,20 +56,6 @@ class RequestLogRepository(BaseRepository):
             delete_query = query.delete(synchronize_session="fetch")
             self.session.execute(delete_query)
             self.session.commit()
-
-
-async def get_request_logs_repository() -> RequestLogRepository:
-    """
-    Provides a RequestLogRepository instance.
-    
-    Args:
-        session (AsyncSession): The async session dependency.
-    
-    Returns:
-        RequestLogRepository: The repository instance.
-    """
-    with get_session() as session:
-        return RequestLogRepository(session)
 
 
 class TaskLogRepository(BaseRepository):
@@ -102,28 +91,34 @@ class TaskLogRepository(BaseRepository):
         return True
 
     def get_all(self, limit: int = 100, offset: int = 0) -> List[TaskLog]:
-        return self.session.execute(
-            select(TaskLog).offset(offset).limit(limit)
-        ).scalars().all()
+        return (
+            self.session.execute(select(TaskLog).offset(offset).limit(limit))
+            .scalars()
+            .all()
+        )
 
     def delete_old_logs(self, time_delta: timedelta):
         cutoff_date = datetime.now() - time_delta
-        self.session.query(TaskLog).filter(TaskLog.talo_start_time < cutoff_date).delete()
+        self.session.query(TaskLog).filter(
+            TaskLog.talo_start_time < cutoff_date
+        ).delete()
         self.session.commit()
 
 
 def get_request_logs_repository():
     with get_session() as session:
         return RequestLogRepository(session)
-    
+
+
 def get_task_logs_repository():
     with get_session() as session:
         return TaskLogRepository(session)
 
-RequestLogsRepositoryDependency=Annotated[
+
+RequestLogsRepositoryDependency = Annotated[
     RequestLogRepository, Depends(get_request_logs_repository)
 ]
 
-TaskLogsRepositoryDependency=Annotated[
+TaskLogsRepositoryDependency = Annotated[
     TaskLogRepository, Depends(get_task_logs_repository)
 ]

@@ -40,11 +40,8 @@ env: ## Creates a virtual environment. Usage: make env
 
 install: ## Installs the python requirements. Usage: make install
 	pip install uv
-	uv pip install -r requirements.txt
-	uv pip install -r requirements_dev.txt
-
-run: ## Run the application. Usage: make run
-	uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+	uv pip install -r "${PWD}/backend/requirements.txt"
+	@cd frontend && pnpm install
 
 search: ## Searchs for a token in the code. Usage: make search token=your_token
 	grep -rnw . --exclude-dir=venv --exclude-dir=.git --exclude=poetry.lock -e "$(token)"
@@ -56,14 +53,12 @@ replace: ## Replaces a token in the code. Usage: make replace token=your_token
 		--exclude=poetry.lock)
 
 lint: ## perform inplace lint fixes
-	@ruff check --unsafe-fixes --fix .
-	@black $(shell git ls-files '*.py')
+	@ruff check --unsafe-fixes --fix backend/
+	@black .
+	@cd frontend && pnpm run lint  # Run pnpm lint in the frontend folder
 
 run: ## Run the application. Usage: make run
 	uvicorn backend.app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
-
-report: test ## Generate coverage report. Usage: make report
-	coverage report --omit=$(OMIT_PATHS) --show-missing
 
 ps: ## List all running containers. Usage: make ps
 	docker compose ps -a

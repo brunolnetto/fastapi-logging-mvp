@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
 
+
 class BaseRepository(ABC):
     def __init__(self, session):
         self.session = session
@@ -24,4 +25,3 @@ class BaseRepository(ABC):
     @abstractmethod
     def get_all(self, limit: int = 100, offset: int = 0) -> List[Any]:
         pass
-
