@@ -8,15 +8,25 @@ importers:
 
   .:
     dependencies:
+      pnpm:
+        specifier: ^9.10.0
+        version: 9.10.0
       swagger-ui-dist:
         specifier: ^5.17.14
         version: 5.17.14
 
 packages:
 
+  pnpm@9.10.0:
+    resolution: {integrity: sha512-c6Ka+jag0JLs5Scd5Rd+y/gxjUVOzXATQxMbjrwMGpHEh9pGq3fI5ZbWrPFGHjWUztS+zt+JIbB0+9hlPtcFHA==}
+    engines: {node: '>=18.12'}
+    hasBin: true
+
   swagger-ui-dist@5.17.14:
     resolution: {integrity: sha512-CVbSfaLpstV65OnSjbXfVd6Sta3q3F7Cj/yYuvHMp1P90LztOLs6PfUnKEVAeiIVQt9u2SaPwv0LiH/OyMjHRw==}
 
 snapshots:
+
+  pnpm@9.10.0: {}
 
   swagger-ui-dist@5.17.14: {}
