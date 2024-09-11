@@ -27,8 +27,8 @@ importers:
         specifier: ^17.3.1
         version: 17.3.1(@vue/compiler-sfc@3.5.3)(vue@3.5.3)(webpack@5.94.0)
       vue-router:
-        specifier: ^4.4.3
-        version: 4.4.3(vue@3.5.3)
+        specifier: ^4.4.4
+        version: 4.4.4(vue@3.5.3)
     devDependencies:
       '@babel/core':
         specifier: ^7.12.16
@@ -46,7 +46,7 @@ importers:
         specifier: ~5.0.0
         version: 5.0.8(@vue/compiler-sfc@3.5.3)(lodash@4.17.21)(vue-template-compiler@2.7.16)(vue@3.5.3)(webpack-sources@3.2.3)
       eslint:
-        specifier: ^9.10.0
+        specifier: ^9.0.0
         version: 9.10.0
       eslint-plugin-vue:
         specifier: ^9.0.0
@@ -1023,6 +1023,9 @@ packages:
 
   '@vue/devtools-api@6.6.3':
     resolution: {integrity: sha512-0MiMsFma/HqA6g3KLKn+AGpL1kgKhFWszC9U29NfpWK5LE7bjeXxySWJrOJ77hBz+TBrBQ7o4QJqbPbqbs8rJw==}
+
+  '@vue/devtools-api@6.6.4':
+    resolution: {integrity: sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g==}
 
   '@vue/reactivity@3.5.3':
     resolution: {integrity: sha512-2w61UnRWTP7+rj1H/j6FH706gRBHdFVpIqEkSDAyIpafBXYH8xt4gttstbbCWdU3OlcSWO8/3mbKl/93/HSMpw==}
@@ -3705,8 +3708,8 @@ packages:
       vue:
         optional: true
 
-  vue-router@4.4.3:
-    resolution: {integrity: sha512-sv6wmNKx2j3aqJQDMxLFzs/u/mjA9Z5LCgy6BE0f7yFWMjrPLnS/sPNn8ARY/FXw6byV18EFutn5lTO6+UsV5A==}
+  vue-router@4.4.4:
+    resolution: {integrity: sha512-3MlnDqwRwZwCQVbtVfpsU+nrNymNjnXSsQtXName5925NVC1+326VVfYH9vSrA0N13teGEo8z5x7gbRnGjCDiQ==}
     peerDependencies:
       vue: ^3.2.0
 
@@ -5342,6 +5345,8 @@ snapshots:
       - whiskers
 
   '@vue/devtools-api@6.6.3': {}
+
+  '@vue/devtools-api@6.6.4': {}
 
   '@vue/reactivity@3.5.3':
     dependencies:
@@ -7942,9 +7947,9 @@ snapshots:
       '@vue/compiler-sfc': 3.5.3
       vue: 3.5.3
 
-  vue-router@4.4.3(vue@3.5.3):
+  vue-router@4.4.4(vue@3.5.3):
     dependencies:
-      '@vue/devtools-api': 6.6.3
+      '@vue/devtools-api': 6.6.4
       vue: 3.5.3
 
   vue-style-loader@4.1.3:
