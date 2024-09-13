@@ -21,14 +21,14 @@ importers:
         specifier: ^5.17.14
         version: 5.17.14
       vue:
-        specifier: ^3.5.4
+        specifier: ^3.2.13
         version: 3.5.4
       vue-loader:
         specifier: ^17.3.1
         version: 17.3.1(@vue/compiler-sfc@3.5.4)(vue@3.5.4)(webpack@5.94.0)
       vue-router:
-        specifier: ^4.4.3
-        version: 4.4.4(vue@3.5.4)
+        specifier: ^4.4.5
+        version: 4.4.5(vue@3.5.4)
     devDependencies:
       '@babel/core':
         specifier: ^7.12.16
@@ -3712,8 +3712,8 @@ packages:
       vue:
         optional: true
 
-  vue-router@4.4.4:
-    resolution: {integrity: sha512-3MlnDqwRwZwCQVbtVfpsU+nrNymNjnXSsQtXName5925NVC1+326VVfYH9vSrA0N13teGEo8z5x7gbRnGjCDiQ==}
+  vue-router@4.4.5:
+    resolution: {integrity: sha512-4fKZygS8cH1yCyuabAXGUAsyi1b2/o/OKgu/RUb+znIYOxPRxdkytJEx+0wGcpBE1pX6vUgh5jwWOKRGvuA/7Q==}
     peerDependencies:
       vue: ^3.2.0
 
@@ -7953,7 +7953,7 @@ snapshots:
       '@vue/compiler-sfc': 3.5.4
       vue: 3.5.4
 
-  vue-router@4.4.4(vue@3.5.4):
+  vue-router@4.4.5(vue@3.5.4):
     dependencies:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.4
