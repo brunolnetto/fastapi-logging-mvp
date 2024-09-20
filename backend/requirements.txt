@@ -7,7 +7,7 @@ psycopg2-binary==2.9.9
 pydantic-settings==2.5.2
 pydantic==2.9.2
 python-dotenv==1.0.1
-ruff==0.6.5
+ruff==0.6.6
 SQLAlchemy-Utils==0.41.2
 SQLAlchemy==2.0.35
 slowapi[redis]==0.1.9
