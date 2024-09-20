@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       pnpm:
-        specifier: ^9.11.0
-        version: 9.11.0
+        specifier: ^9.9.0
+        version: 9.10.0
       swagger-ui-dist:
         specifier: ^5.17.14
         version: 5.17.14
