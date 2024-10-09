@@ -1,6 +1,6 @@
 APScheduler==3.10.4
 asyncpg==0.29.0
-black==24.8.0
+black==24.10.0
 fastapi==0.115.0
 jinja2
 psycopg2-binary==2.9.9
