@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       axios:
-        specifier: ^1.7.8
+        specifier: ^1.7.7
         version: 1.7.8
       core-js:
         specifier: ^3.8.3
@@ -27,7 +27,7 @@ importers:
         specifier: ^17.3.1
         version: 17.3.1(@vue/compiler-sfc@3.5.12)(vue@3.5.12)(webpack@5.94.0)
       vue-router:
-        specifier: ^4.5.0
+        specifier: ^4.4.3
         version: 4.5.0(vue@3.5.12)
     devDependencies:
       '@babel/core':
