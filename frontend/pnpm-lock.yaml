@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       axios:
-        specifier: ^1.7.9
+        specifier: ^1.7.7
         version: 1.7.9
       core-js:
         specifier: ^3.8.3
@@ -46,7 +46,7 @@ importers:
         specifier: ~5.0.0
         version: 5.0.8(@vue/compiler-sfc@3.5.12)(lodash@4.17.21)(vue-template-compiler@2.7.16)(vue@3.5.12)(webpack-sources@3.2.3)
       eslint:
-        specifier: ^9.16.0
+        specifier: ^9.0.0
         version: 9.16.0
       eslint-plugin-vue:
         specifier: ^9.0.0
@@ -7708,7 +7708,7 @@ snapshots:
 
   spdy-transport@3.0.0:
     dependencies:
-      debug: 4.3.6
+      debug: 4.3.7
       detect-node: 2.1.0
       hpack.js: 2.1.6
       obuf: 1.1.2
@@ -7719,7 +7719,7 @@ snapshots:
 
   spdy@4.0.2:
     dependencies:
-      debug: 4.3.6
+      debug: 4.3.7
       handle-thing: 2.0.1
       http-deceiver: 1.2.7
       select-hose: 2.0.0
