@@ -20,8 +20,8 @@ packages:
   '@scarf/scarf@1.4.0':
     resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
 
-  pnpm@9.14.4:
-    resolution: {integrity: sha512-yBgLP75OS8oCyUI0cXiWtVKXQKbLrfGfp4JUJwQD6i8n1OHUagig9WyJtj3I6/0+5TMm2nICc3lOYgD88NGEqw==}
+  pnpm@9.15.1:
+    resolution: {integrity: sha512-GstWXmGT7769p3JwKVBGkVDPErzHZCYudYfnHRncmKQj3/lTblfqRMSb33kP9pToPCe+X6oj1n4MAztYO+S/zw==}
     engines: {node: '>=18.12'}
     hasBin: true
 
@@ -32,7 +32,7 @@ snapshots:
 
   '@scarf/scarf@1.4.0': {}
 
-  pnpm@9.14.4: {}
+  pnpm@9.15.1: {}
 
   swagger-ui-dist@5.18.2:
     dependencies:

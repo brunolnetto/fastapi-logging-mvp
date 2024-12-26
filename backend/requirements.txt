@@ -4,11 +4,11 @@ black==24.10.0
 fastapi==0.115.6
 jinja2
 psycopg2-binary==2.9.10
-pydantic-settings==2.6.1
-pydantic==2.10.3
+pydantic-settings==2.7.0
+pydantic==2.10.4
 python-dotenv==1.0.1
-ruff==0.8.2
+ruff==0.8.4
 SQLAlchemy-Utils==0.41.2
 SQLAlchemy==2.0.36
 slowapi[redis]==0.1.9
-uvicorn==0.32.1
+uvicorn==0.34.0
