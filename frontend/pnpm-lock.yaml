@@ -49,7 +49,7 @@ importers:
         specifier: ^9.0.0
         version: 9.17.0
       eslint-plugin-vue:
-        specifier: ^9.32.0
+        specifier: ^9.0.0
         version: 9.32.0(eslint@9.17.0)
       vue-template-compiler:
         specifier: ^2.7.16
@@ -7723,7 +7723,7 @@ snapshots:
 
   spdy-transport@3.0.0:
     dependencies:
-      debug: 4.3.7
+      debug: 4.4.0
       detect-node: 2.1.0
       hpack.js: 2.1.6
       obuf: 1.1.2
@@ -7734,7 +7734,7 @@ snapshots:
 
   spdy@4.0.2:
     dependencies:
-      debug: 4.3.7
+      debug: 4.4.0
       handle-thing: 2.0.1
       http-deceiver: 1.2.7
       select-hose: 2.0.0
@@ -7839,7 +7839,7 @@ snapshots:
   terser@5.31.6:
     dependencies:
       '@jridgewell/source-map': 0.3.6
-      acorn: 8.12.1
+      acorn: 8.14.0
       commander: 2.20.3
       source-map-support: 0.5.21
 
