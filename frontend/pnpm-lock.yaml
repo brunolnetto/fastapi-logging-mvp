@@ -12,11 +12,11 @@ importers:
         specifier: ^1.7.7
         version: 1.7.9
       core-js:
-        specifier: ^3.40.0
+        specifier: ^3.8.3
         version: 3.40.0
       pinia:
-        specifier: ^2.2.2
-        version: 2.3.0(vue@3.5.12)
+        specifier: ^2.3.1
+        version: 2.3.1(vue@3.5.12)
       swagger-ui-dist:
         specifier: ^5.17.14
         version: 5.18.2
@@ -2955,8 +2955,8 @@ packages:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
 
-  pinia@2.3.0:
-    resolution: {integrity: sha512-ohZj3jla0LL0OH5PlLTDMzqKiVw2XARmC1XYLdLWIPBMdhDW/123ZWr4zVAhtJm+aoSkFa13pYXskAvAscIkhQ==}
+  pinia@2.3.1:
+    resolution: {integrity: sha512-khUlZSwt9xXCaTbbxFYBKDc/bWAGWJjOgvxETwkTN7KRm66EeT1ZdZj6i2ceh9sP2Pzqsbc704r2yngBrxBVug==}
     peerDependencies:
       typescript: '>=4.4.4'
       vue: ^2.7.0 || ^3.5.11
@@ -7184,7 +7184,7 @@ snapshots:
 
   picomatch@2.3.1: {}
 
-  pinia@2.3.0(vue@3.5.12):
+  pinia@2.3.1(vue@3.5.12):
     dependencies:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.12
