@@ -9,10 +9,10 @@ importers:
   .:
     dependencies:
       pnpm:
-        specifier: ^9.9.0
-        version: 9.15.3
+        specifier: ^9.15.9
+        version: 9.15.9
       swagger-ui-dist:
-        specifier: ^5.20.1
+        specifier: ^5.17.14
         version: 5.20.1
 
 packages:
@@ -20,8 +20,8 @@ packages:
   '@scarf/scarf@1.4.0':
     resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
 
-  pnpm@9.15.3:
-    resolution: {integrity: sha512-H3m8JFpm6wsHxdTYMTEkB3RkLKqobvfQQ0q0fA0W9msE4h4MCG62HmLHfvxNf37Aca+tN5avZIkvrmZQkXOJOg==}
+  pnpm@9.15.9:
+    resolution: {integrity: sha512-aARhQYk8ZvrQHAeSMRKOmvuJ74fiaR1p5NQO7iKJiClf1GghgbrlW1hBjDolO95lpQXsfF+UA+zlzDzTfc8lMQ==}
     engines: {node: '>=18.12'}
     hasBin: true
 
@@ -32,7 +32,7 @@ snapshots:
 
   '@scarf/scarf@1.4.0': {}
 
-  pnpm@9.15.3: {}
+  pnpm@9.15.9: {}
 
   swagger-ui-dist@5.20.1:
     dependencies:
