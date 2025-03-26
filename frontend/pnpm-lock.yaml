@@ -12,7 +12,7 @@ importers:
         specifier: ^1.8.4
         version: 1.8.4
       core-js:
-        specifier: ^3.8.3
+        specifier: ^3.41.0
         version: 3.41.0
       pinia:
         specifier: ^2.2.2
