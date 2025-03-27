@@ -12,8 +12,8 @@ importers:
         specifier: ^10.0.0
         version: 10.7.0
       swagger-ui-dist:
-        specifier: ^5.17.14
-        version: 5.20.1
+        specifier: ^5.20.2
+        version: 5.20.2
 
 packages:
 
@@ -25,8 +25,8 @@ packages:
     engines: {node: '>=18.12'}
     hasBin: true
 
-  swagger-ui-dist@5.20.1:
-    resolution: {integrity: sha512-qBPCis2w8nP4US7SvUxdJD3OwKcqiWeZmjN2VWhq2v+ESZEXOP/7n4DeiOiiZcGYTKMHAHUUrroHaTsjUWTEGw==}
+  swagger-ui-dist@5.20.2:
+    resolution: {integrity: sha512-zP2biZvCt6R1IAz/iGcjeEViHez7UPHUFfMFyF6jcTKS1ZIP2cgr+KSZEMhBnpIcFfDrZxkD8v56taL5A8phuA==}
 
 snapshots:
 
@@ -34,6 +34,6 @@ snapshots:
 
   pnpm@10.7.0: {}
 
-  swagger-ui-dist@5.20.1:
+  swagger-ui-dist@5.20.2:
     dependencies:
       '@scarf/scarf': 1.4.0
