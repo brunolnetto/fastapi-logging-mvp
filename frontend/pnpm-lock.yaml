@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       axios:
-        specifier: ^1.11.0
+        specifier: ^1.7.7
         version: 1.11.0
       core-js:
         specifier: ^3.8.3
@@ -18,7 +18,7 @@ importers:
         specifier: ^3.0.0
         version: 3.0.1(vue@3.5.13)
       swagger-ui-dist:
-        specifier: ^5.27.1
+        specifier: ^5.17.14
         version: 5.27.1
       vue:
         specifier: ^3.2.13
@@ -27,8 +27,8 @@ importers:
         specifier: ^17.3.1
         version: 17.4.2(@vue/compiler-sfc@3.5.13)(vue@3.5.13)(webpack@5.98.0)
       vue-router:
-        specifier: ^4.4.3
-        version: 4.5.0(vue@3.5.13)
+        specifier: ^4.5.1
+        version: 4.5.1(vue@3.5.13)
     devDependencies:
       '@babel/core':
         specifier: ^7.12.16
@@ -3705,8 +3705,8 @@ packages:
       vue:
         optional: true
 
-  vue-router@4.5.0:
-    resolution: {integrity: sha512-HDuk+PuH5monfNuY+ct49mNmkCRK4xJAV9Ts4z9UFc4rzdDnxQLyCMGGc8pKhZhHTVzfanpNwB/lwqevcBwI4w==}
+  vue-router@4.5.1:
+    resolution: {integrity: sha512-ogAF3P97NPm8fJsE4by9dwSYtDwXIY1nFY9T6DyQnGHd1E2Da94w9JIolpe42LJGIl0DwOHBi8TcRPlPGwbTtw==}
     peerDependencies:
       vue: ^3.2.0
 
@@ -7946,7 +7946,7 @@ snapshots:
       '@vue/compiler-sfc': 3.5.13
       vue: 3.5.13
 
-  vue-router@4.5.0(vue@3.5.13):
+  vue-router@4.5.1(vue@3.5.13):
     dependencies:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.13
