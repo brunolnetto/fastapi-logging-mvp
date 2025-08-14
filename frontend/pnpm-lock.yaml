@@ -18,8 +18,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.1(vue@3.5.13)
       swagger-ui-dist:
-        specifier: ^5.17.14
-        version: 5.20.2
+        specifier: ^5.27.1
+        version: 5.27.1
       vue:
         specifier: ^3.2.13
         version: 3.5.13
@@ -3530,8 +3530,8 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  swagger-ui-dist@5.20.2:
-    resolution: {integrity: sha512-zP2biZvCt6R1IAz/iGcjeEViHez7UPHUFfMFyF6jcTKS1ZIP2cgr+KSZEMhBnpIcFfDrZxkD8v56taL5A8phuA==}
+  swagger-ui-dist@5.27.1:
+    resolution: {integrity: sha512-oGtpYO3lnoaqyGtlJalvryl7TwzgRuxpOVWqEHx8af0YXI+Kt+4jMpLdgMtMcmWmuQ0QTCHLKExwrBFMSxvAUA==}
 
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
@@ -7746,7 +7746,7 @@ snapshots:
       picocolors: 1.1.1
       stable: 0.1.8
 
-  swagger-ui-dist@5.20.2:
+  swagger-ui-dist@5.27.1:
     dependencies:
       '@scarf/scarf': 1.4.0
 
