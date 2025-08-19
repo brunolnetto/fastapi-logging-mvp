@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       axios:
-        specifier: ^1.11.0
+        specifier: ^1.7.7
         version: 1.11.0
       core-js:
         specifier: ^3.8.3
@@ -18,7 +18,7 @@ importers:
         specifier: ^3.0.0
         version: 3.0.1(vue@3.5.13)
       swagger-ui-dist:
-        specifier: ^5.27.1
+        specifier: ^5.17.14
         version: 5.27.1
       vue:
         specifier: ^3.2.13
